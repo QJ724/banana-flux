@@ -2,31 +2,31 @@ import streamlit as st
 import requests
 import io
 from PIL import Image
-import time
 
-# --- CONFIGURAZIONE PAGINA ---
+# --- CONFIGURAZIONE ---
 st.set_page_config(page_title="Nano Banana Flux", page_icon="🍌")
 
-st.title("🍌 Nano Banana (Flux Edition)")
-st.write("Genera immagini incredibili usando il modello FLUX.1 tramite Hugging Face.")
+st.title("Jack Generator")
+st.write("Genera immagini incredibili usando l'AI.")
+st.write("Modello: FLUX.1-schnell di Hugging Face")
 
-# --- BARRA LATERALE ---
-with st.sidebar:
-    st.header("Chiavi di Accesso")
-    # Qui incollerai il token hf_... che hai usato prima
+
+# --- RECUPERO LA CHIAVE SEGRETA ---
+# Il codice cerca la chiave nei "Secrets" di Streamlit Cloud
+try:
+    hf_token = st.secrets["HF_TOKEN"]
+except:
+    # Se siamo sul tuo PC e non hai impostato i secrets, te la chiede a mano
+    st.warning("⚠️ Chiave segreta non trovata. Inseriscila manualmente.")
     hf_token = st.text_input("Hugging Face Token", type="password")
-    
-    st.divider()
-    st.info("💡 Usa il token che hai creato su huggingface.co")
 
 # --- AREA PRINCIPALE ---
 prompt = st.text_area(
     "Descrivi la tua immagine:", 
-    "Un astronauta che cavalca un cavallo su Marte, fotorealistico, 8k",
+    "Un gatto cyberpunk che beve caffè al neon, realistico",
     height=100
 )
 
-# URL del nuovo server (Router)
 API_URL = "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell"
 
 def query_hugging_face(payload, token):
@@ -34,34 +34,29 @@ def query_hugging_face(payload, token):
     response = requests.post(API_URL, headers=headers, json=payload)
     return response.content
 
-# --- BOTTONE GENERAZIONE ---
-if st.button("✨ Genera con Flux", type="primary"):
+if st.button("✨ Genera Immagine", type="primary"):
     if not hf_token:
-        st.error("🛑 Inserisci il Token Hugging Face nella barra laterale!")
+        st.error("Chiave mancante!")
     else:
-        with st.spinner('Flux sta disegnando... (attendi qualche secondo)'):
+        with st.spinner('L\'AI sta disegnando per te...'):
             try:
-                # Chiamata all'API
                 image_bytes = query_hugging_face({"inputs": prompt}, hf_token)
                 
-                # Gestione Errori del server
                 if b"error" in image_bytes:
-                    st.error(f"Errore dal server: {image_bytes}")
+                    st.error(f"Errore momentaneo del server AI. Riprova tra poco!")
                 else:
-                    # Mostra l'immagine
                     image = Image.open(io.BytesIO(image_bytes))
-                    st.image(image, caption="Generata con Flux.1 Schnell", use_container_width=True)
+                    st.image(image, caption="Generata da Nano Banana", use_container_width=True)
                     
                     # Bottone Download
                     buf = io.BytesIO()
                     image.save(buf, format="PNG")
                     st.download_button(
-                        label="⬇️ Scarica Immagine",
+                        label="⬇️ Scarica HD",
                         data=buf.getvalue(),
-                        file_name="flux_banana.png",
+                        file_name="banana_art.png",
                         mime="image/png"
                     )
-                    st.success("Fatto! 🍌")
 
             except Exception as e:
                 st.error(f"Qualcosa è andato storto: {e}")
