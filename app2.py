@@ -46,15 +46,15 @@ if st.button("✨ Genera Immagine", type="primary"):
                     st.error(f"Errore momentaneo del server AI. Riprova tra poco!")
                 else:
                     image = Image.open(io.BytesIO(image_bytes))
-                    st.image(image, caption="Generata da Nano Banana", use_container_width=True)
+                    st.image(image, caption="Generata da AI", use_container_width=True)
                     
                     # Bottone Download
                     buf = io.BytesIO()
                     image.save(buf, format="PNG")
                     st.download_button(
-                        label="⬇️ Scarica HD",
+                        label="⬇️ Scarica in HD",
                         data=buf.getvalue(),
-                        file_name="banana_art.png",
+                        file_name="wimblyfile.png",
                         mime="image/png"
                     )
 
